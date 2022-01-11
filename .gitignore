@@ -1,0 +1,5 @@
+java-code/target/
+java-code/.idea/
+*.iml
+*.pyc
+swapping-diagrams/
