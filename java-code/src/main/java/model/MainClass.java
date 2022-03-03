@@ -458,15 +458,16 @@ public class MainClass {
                 donkeysInstance.getNumberOfSwaps() + " swaps.");
 
 
-        RealizationGraph realizationGraph = donkeysInstance.computeOneRealization();
+        RealizationGraph realizationGraph = donkeysInstance.computeOneMinHeightRealization();
 
         if (realizationGraph == null) {
             System.out.println("!!! FOUND NO REALIZATION !!!");
             return false;
         }
 
-        System.out.println("Found a realization.");
-        drawSwappingDiagram(donkeysInstance, realizationGraph.getSwappingDiagramOfMinimumHeight(donkeysInstance),
+        SwappingDiagram swappingDiagram = realizationGraph.getSwappingDiagramOfMinimumHeight(donkeysInstance);
+        System.out.println("Found a realization with " + swappingDiagram.getLayers().size() + " layers.");
+        drawSwappingDiagram(donkeysInstance, swappingDiagram,
                 PATH_SWAPPING_DIAGRAMS + File.separator + "donkey-m" + m + "-k" + k + ".svg");
         return true;
     }

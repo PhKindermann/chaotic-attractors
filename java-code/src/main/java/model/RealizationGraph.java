@@ -13,6 +13,16 @@ import java.util.*;
  */
 public class RealizationGraph extends DirectedSparseGraph<Pair<OrderedSwap, Integer>, Integer> {
 
+
+    /**
+     * This {@link RealizationGraph} instance must be acyclic - this is not checked!
+     *
+     * @return
+     */
+    public int getHeight(LineSwapper correspondingLineSwapper) {
+        return this.getSwappingDiagramOfMinimumHeight(correspondingLineSwapper).getLayers().size();
+    }
+
     /**
      * This {@link RealizationGraph} instance must be acyclic - this is not checked!
      *
@@ -56,7 +66,9 @@ public class RealizationGraph extends DirectedSparseGraph<Pair<OrderedSwap, Inte
             }
             currentSources = newSources;
         }
-        swappingDiagram.getLayers().add(currentSources);
+        if (!currentSources.isEmpty()) {
+            swappingDiagram.getLayers().add(currentSources);
+        }
 
         return swappingDiagram;
     }

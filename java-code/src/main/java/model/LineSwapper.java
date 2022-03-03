@@ -128,7 +128,40 @@ public class LineSwapper {
      *
      * @return null if no realization exists
      */
+    public RealizationGraph computeOneMinHeightRealization() {
+        int currentMinHeight = Integer.MAX_VALUE;
+        RealizationGraph currentMinHeightRealization = null;
+
+        while (true) {
+            RealizationGraph intermediateOutput = computeOneRealization(currentMinHeight -
+                    (currentMinHeight == Integer.MAX_VALUE ? 0 : 1));
+            if (intermediateOutput == null) {
+                break;
+            }
+            currentMinHeightRealization = intermediateOutput;
+            currentMinHeight = currentMinHeightRealization.getHeight(this);
+        }
+
+        return currentMinHeightRealization;
+    }
+
+    /**
+     *
+     * @return null if no realization exists
+     */
     public RealizationGraph computeOneRealization() {
+        return computeOneRealization(Integer.MAX_VALUE);
+    }
+
+    /**
+     *
+     * @return null if no realization exists
+     */
+    public RealizationGraph computeOneRealization(int maxHeight) {
+        if (maxHeight < 0) {
+            return null;
+        }
+
         computeAllTripletRealizations();
 
         //preparing
@@ -168,7 +201,8 @@ public class LineSwapper {
             RealizationGraph tripletRealization = allTripletRealizations.get(numberInRealizationCollection);
             RealizationGraph possibleRealization = combineDependencies(realization, tripletRealization);
             //success
-            if (possibleRealization != null && !CycleFinder.containsCycle(possibleRealization)) {
+            if (possibleRealization != null && !CycleFinder.containsCycle(possibleRealization)
+                    && (maxHeight == Integer.MAX_VALUE || possibleRealization.getHeight(this) <= maxHeight)) {
                 //try first and remove it from the list of "open" realizations in the stack
 //                WeakComponentClusterer<Pair<OrderedSwap, Integer>, Integer> wcc = new WeakComponentClusterer<>();
 //                Set<Set<Pair<OrderedSwap, Integer>>> components = wcc.apply(possibleRealization);
