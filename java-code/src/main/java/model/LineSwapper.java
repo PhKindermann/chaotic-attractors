@@ -53,14 +53,16 @@ public class LineSwapper {
     }
 
     public int getNumberOfSwaps(UnorderedSwap swap) {
-        return inputMatrix[swap.getLineWithSmallerNumber().getLineNumber()][swap.getLineWithGreaterNumber().getLineNumber()];
+        //use only absolute values for the matrices
+        return Math.abs(inputMatrix[swap.getLineWithSmallerNumber().getLineNumber()][swap.getLineWithGreaterNumber().getLineNumber()]);
     }
 
     public int getNumberOfSwaps() {
         int sum = 0;
         for (int i = 0; i < numberOfLines - 1; i++) {
             for (int j = i + 1; j < numberOfLines; j++) {
-                sum += this.inputMatrix[i][j];
+                //use only absolute values for the matrices
+                sum += Math.abs(this.inputMatrix[i][j]);
             }
         }
         return sum;
@@ -106,10 +108,12 @@ public class LineSwapper {
         for (int i = 0; i < numberOfLines; ++i) {
             int position = i;
             for (int j = 0; j < i; ++j) {
-                position -= this.inputMatrix[j][i] % 2;
+                //use only absolute values for the matrices
+                position -= Math.abs(this.inputMatrix[j][i]) % 2;
             }
             for (int j = i + 1; j < numberOfLines; ++j) {
-                position += this.inputMatrix[i][j] % 2;
+                //use only absolute values for the matrices
+                position += Math.abs(this.inputMatrix[i][j]) % 2;
             }
             //fail: two lines end up at the same position => infeasible
             if (finalPositions[position] != null) {
@@ -178,12 +182,10 @@ public class LineSwapper {
          */
         ArrayList<Pair<Integer, List<RealizationGraph>>> currentlyTried = new ArrayList<>(numberOfTriplets);
 
-        int index = 0;
         for (int numberOfRealizations : allTripletRealizations.keySet().stream().sorted().collect(Collectors.toList())) {
             for (ArrayList<RealizationGraph> collectionForOneTriplet :
                     allTripletRealizations.get(numberOfRealizations)) {
-                currentlyTried.add(index, new Pair<>(0, collectionForOneTriplet));
-                ++index;
+                currentlyTried.add(new Pair<>(0, collectionForOneTriplet));
             }
         }
 
@@ -276,8 +278,9 @@ public class LineSwapper {
                 Line lineJ = new Line(j);
                 for (int k = j + 1; k < numberOfLines; ++k) {
                     Line lineK = new Line(k);
-                    LineTriplet triplet = new LineTriplet(lineI, lineJ, lineK, inputMatrix[i][j], inputMatrix[i][k],
-                            inputMatrix[j][k]);
+                    //use only absolute values for the matrices
+                    LineTriplet triplet = new LineTriplet(lineI, lineJ, lineK,
+                            Math.abs(inputMatrix[i][j]), Math.abs(inputMatrix[i][k]), Math.abs(inputMatrix[j][k]));
                     ArrayList<RealizationGraph> executionSequences = computeAllRealizations(triplet);
                     if (!allTripletRealizations.containsKey(executionSequences.size())) {
                         allTripletRealizations.put(executionSequences.size(), new LinkedList<>());
@@ -458,7 +461,7 @@ public class LineSwapper {
 
     @Override
     public String toString() {
-        return "LineSwapper{" + "inputMatrix=" + Arrays.toString(inputMatrix) + '}';
+        return "LineSwapper{" + "inputMatrix=" + Arrays.stream(inputMatrix).map(Arrays::toString).collect(Collectors.joining()) + '}';
     }
 
 
@@ -502,7 +505,7 @@ public class LineSwapper {
             for (int j = i + 1; j < numberOfLines; ++j) {
                 Line lineJ = new Line(j);
 
-                if (inputMatrix[i][j] > 0) {
+                if (inputMatrix[i][j] != 0) {
                     allSwaps.add(new UnorderedSwap(lineI, lineJ));
                 }
             }
@@ -517,8 +520,9 @@ public class LineSwapper {
             for (int j = i + 1; j < numberOfLines; ++j) {
                 Line lineJ = new Line(j);
 
-                if (inputMatrix[i][j] > 0) {
-                    swap2occurrenceCount.put(new UnorderedSwap(lineI, lineJ), inputMatrix[i][j]);
+                if (inputMatrix[i][j] != 0) {
+                    //use only absolute values for the matrices
+                    swap2occurrenceCount.put(new UnorderedSwap(lineI, lineJ), Math.abs(inputMatrix[i][j]));
                 }
             }
         }
@@ -668,7 +672,7 @@ public class LineSwapper {
             for (int i = 0; i < numberOfLines - 1; i++) {
                 for (int j = i + 1; j < numberOfLines; j++) {
                     UnorderedSwap swap = new UnorderedSwap(new Line(i), new Line(j));
-                    if (this.inputMatrix[i][j] > 0) {
+                    if (this.inputMatrix[i][j] != 0) {
                         if (!blueSet.contains(swap)) {
                             swapsA.add(swap);
                         }
@@ -1085,8 +1089,9 @@ public class LineSwapper {
         for (int i = 0; i < numberOfLines - 1; i++) {
             for (int j = i + 1; j < numberOfLines; j++) {
                 UnorderedSwap swap = new UnorderedSwap(new Line(i), new Line(j));
-                if (this.inputMatrix[i][j] > 0) {
-                    remainingSwaps.put(swap, this.inputMatrix[i][j]);
+                if (this.inputMatrix[i][j] != 0) {
+                    //use only absolute values for the matrices
+                    remainingSwaps.put(swap, Math.abs(this.inputMatrix[i][j]));
                 }
             }
         }

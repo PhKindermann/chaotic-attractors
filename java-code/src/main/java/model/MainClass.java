@@ -60,30 +60,47 @@ public class MainClass {
         long computationTime = 0;
         File file = new File(PATH_TO_EXAMPLES);
         for (File exampleFile : file.listFiles()) {
-            if (exampleFile.getPath().endsWith(".json")) {
-                LineSwapper lineSwapper = SwappingMatrixReader.loadFile(exampleFile.getAbsolutePath());
-                long computationStartTime = System.currentTimeMillis();
-                SwappingDiagram swappingDiagramOfMinimumHeight = null;
-                for (RealizationGraph realizationGraph : lineSwapper.computeAllRealizations()) {
-                    SwappingDiagram swappingDiagram =
-                            realizationGraph.getSwappingDiagramOfMinimumHeight(lineSwapper);
-                    if (swappingDiagramOfMinimumHeight == null ||
-                            swappingDiagram.getLayers().size() < swappingDiagramOfMinimumHeight.getLayers().size()) {
-                        swappingDiagramOfMinimumHeight = swappingDiagram;
-                    }
-                }
-                long computationEndTime = System.currentTimeMillis();
-                computationTime += (computationEndTime - computationStartTime);
-                //our solution as string which we pass completely to python as its first argument
-                String outputPathPythonParam = "" + PATH_TO_SVG_TARGET_DIR + File.separator +
-                        exampleFile.getName().substring(0, exampleFile.getName().length() - 4) + ".svg";
-                drawSwappingDiagram(lineSwapper, swappingDiagramOfMinimumHeight, outputPathPythonParam);
+            if (exampleFile.getPath().endsWith(".json") && exampleFile.getPath().contains("5x5")) {
+                computationTime = computeTangle(exampleFile, computationTime);
             }
         }
         long endTime = System.currentTimeMillis();
         System.out.println("Needed " + (endTime - startTime) + " ms for reading json files, computing diagrams, writing svg files.");
         System.out.println("The pure Java computation time was " + computationTime + " ms, which is " +
                 (100 * computationTime / (endTime - startTime)) + " % of the total time.");
+        for (File exampleFile : file.listFiles()) {
+            if (exampleFile.getPath().endsWith(".json") && exampleFile.getPath().contains("6x6")) {
+                computationTime = computeTangle(exampleFile, computationTime);
+            }
+        }
+        endTime = System.currentTimeMillis();
+        System.out.println("Needed " + (endTime - startTime) + " ms for reading json files, computing diagrams, writing svg files.");
+        System.out.println("The pure Java computation time was " + computationTime + " ms, which is " +
+                (100 * computationTime / (endTime - startTime)) + " % of the total time.");
+        for (File exampleFile : file.listFiles()) {
+            if (exampleFile.getPath().endsWith(".json") && exampleFile.getPath().contains("7x7")) {
+                computationTime = computeTangle(exampleFile, computationTime);
+            }
+        }
+        endTime = System.currentTimeMillis();
+        System.out.println("Needed " + (endTime - startTime) + " ms for reading json files, computing diagrams, writing svg files.");
+        System.out.println("The pure Java computation time was " + computationTime + " ms, which is " +
+                (100 * computationTime / (endTime - startTime)) + " % of the total time.");
+    }
+
+    private static long computeTangle(File exampleFile, long currentComputationTime) {
+        LineSwapper lineSwapper = SwappingMatrixReader.loadFile(exampleFile.getAbsolutePath());
+        long computationStartTime = System.currentTimeMillis();
+        SwappingDiagram swappingDiagramOfMinimumHeight = lineSwapper.computeOneMinHeightRealization().
+                getSwappingDiagramOfMinimumHeight(lineSwapper);
+        long computationEndTime = System.currentTimeMillis();
+        currentComputationTime += (computationEndTime - computationStartTime);
+        //our solution as string which we pass completely to python as its first argument
+        String outputPathPythonParam = "" + PATH_TO_SVG_TARGET_DIR + File.separator +
+                exampleFile.getName().substring(0, exampleFile.getName().length() - 4) + ".svg";
+        drawSwappingDiagram(lineSwapper, swappingDiagramOfMinimumHeight, outputPathPythonParam);
+        System.out.println("Completed drawing of " + exampleFile.getPath() + ".");
+        return currentComputationTime;
     }
 
     private static void drawSwappingDiagram(LineSwapper lineSwapper, SwappingDiagram swappingDiagram,
