@@ -91,15 +91,22 @@ public class MainClass {
     private static long computeTangle(File exampleFile, long currentComputationTime) {
         LineSwapper lineSwapper = SwappingMatrixReader.loadFile(exampleFile.getAbsolutePath());
         long computationStartTime = System.currentTimeMillis();
-        SwappingDiagram swappingDiagramOfMinimumHeight = lineSwapper.computeOneMinHeightRealization().
-                getSwappingDiagramOfMinimumHeight(lineSwapper);
+        RealizationGraph realizationGraphOfMinimumHeight = lineSwapper.computeOneMinHeightRealization();
         long computationEndTime = System.currentTimeMillis();
         currentComputationTime += (computationEndTime - computationStartTime);
-        //our solution as string which we pass completely to python as its first argument
-        String outputPathPythonParam = "" + PATH_TO_SVG_TARGET_DIR + File.separator +
-                exampleFile.getName().substring(0, exampleFile.getName().length() - 4) + ".svg";
-        drawSwappingDiagram(lineSwapper, swappingDiagramOfMinimumHeight, outputPathPythonParam);
-        System.out.println("Completed drawing of " + exampleFile.getPath() + ".");
+        //if there was a solution, draw it, otherwise say that there is no solution
+        if (realizationGraphOfMinimumHeight == null) {
+            System.out.println("No solution found for " + exampleFile.getPath() + " (infeasible instance).");
+        }
+        else {
+            SwappingDiagram swappingDiagramOfMinimumHeight = realizationGraphOfMinimumHeight.
+                    getSwappingDiagramOfMinimumHeight(lineSwapper);
+            //our solution as string which we pass completely to python as its first argument
+            String outputPathPythonParam = "" + PATH_TO_SVG_TARGET_DIR + File.separator +
+                    exampleFile.getName().substring(0, exampleFile.getName().length() - 5) + ".svg";
+            drawSwappingDiagram(lineSwapper, swappingDiagramOfMinimumHeight, outputPathPythonParam);
+            System.out.println("Completed drawing of " + exampleFile.getPath() + ".");
+        }
         return currentComputationTime;
     }
 
